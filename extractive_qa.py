@@ -21,9 +21,6 @@ from allennlp.modules.token_embedders import Embedding
 from allennlp.modules.text_field_embedders import BasicTextFieldEmbedder
 
 from data_loading import *
-from model_knrm import *
-from model_conv_knrm import *
-from model_tk import *
 from util import *
 from allennlp.nn.util import move_to_device
 from util import *
