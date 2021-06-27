@@ -1,7 +1,7 @@
 from transformers import DistilBertTokenizer
 from transformers import DistilBertForQuestionAnswering, AutoTokenizer
 from transformers import AutoModelForQuestionAnswering
-from transformers import AlbertTokenizer, TFAlbertModel
+from transformers import AlbertTokenizer, AlbertForQuestionAnswering
 from allennlp.common.file_utils import cached_path
 import numpy as np
 import time
@@ -22,7 +22,8 @@ class ExtractiveQA:
         self.answers_queries = []
         self.results = []
         self.documents = {}
-        self.device = "cuda:0" if torch.cuda.is_available() else "cpu"
+        self.device = "cpu"
+        #self.device = "cuda:0" if torch.cuda.is_available() else "cpu"
         print("Using "+self.device)
 
         if model == Models.BERT:
@@ -39,8 +40,9 @@ class ExtractiveQA:
         elif model == Models.AlBERT:
             print("Initiliazing AlBERT model")
             self.name = "AlBERT"
-            #self.tokenizer = AlbertTokenizer.from_pretrained('albert-xxlarge-v2')
-            #self.model = TFAlbertModel.from_pretrained("albert-xxlarge-v2")
+            self.tokenizer = AlbertTokenizer.from_pretrained('albert-xxlarge-v2')
+            self.model = AlbertForQuestionAnswering.from_pretrained("albert-xxlarge-v2").to(
+                self.device)
         elif model == Models.roBERTa:
             print("Initiliazing roBERTa model")
             self.name = "roBERTa"
@@ -78,6 +80,7 @@ class ExtractiveQA:
         '''
         Run inference and return answers.
         '''
+        print("Inference running with "+self.name)
         queryid, documentid, document_text, questions, answers = self.load_data("./data/fira.qrels.qa-tuples.tsv")
 
         for queryid, documentid, question, text in zip(queryid, documentid, questions, document_text):
